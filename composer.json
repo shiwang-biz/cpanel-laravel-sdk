@@ -1,5 +1,5 @@
 {
-    "name": "shiwang/cpanel-laravel-sdk",
+    "name": "shiwang-biz/cpanel-laravel-sdk",
     "description": "Laravel SDK for WHM and cPanel APIs, authenticated via WHM root credentials (WHMCS-style account management).",
     "type": "library",
     "license": "MIT",
