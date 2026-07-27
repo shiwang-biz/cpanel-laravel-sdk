@@ -106,6 +106,59 @@ Cpanel::packages()->delete('gold');
 Cpanel::packages()->list();
 ```
 
+```php
+// Create a DNS zone
+Cpanel::dns()->create('example.com', '192.0.2.10');
+
+// Dump / reset / delete a zone
+Cpanel::dns()->dump('example.com');
+Cpanel::dns()->reset('example.com');
+Cpanel::dns()->delete('example.com');
+
+// Edit zone records (raw WHM editzone params, e.g. add/edit/remove records)
+Cpanel::dns()->editZone('example.com', [
+    'add' => [
+        ['record' => 'www', 'type' => 'A', 'ttl' => 14400, 'data' => '192.0.2.10'],
+    ],
+]);
+```
+
+```php
+// Install an SSL certificate
+Cpanel::ssl()->install('example.com', $certPem, $keyPem, $caBundlePem);
+
+// Fetch installed certificate info
+Cpanel::ssl()->info('example.com');
+
+// Trigger an AutoSSL check/renewal for a cPanel user
+Cpanel::ssl()->runAutoSsl('newuser');
+```
+
+```php
+// Addon domains, subdomains, and parked domains have no direct WHM API 1
+// equivalent — WHM proxies these through the target cPanel account's classic
+// API 2 modules, so every call needs that account's cPanel username.
+Cpanel::domains()->addAddonDomain('newuser', 'addon.com', 'addon', 'public_html/addon');
+Cpanel::domains()->deleteAddonDomain('newuser', 'addon.com', 'addon');
+
+Cpanel::domains()->addSubdomain('newuser', 'blog', 'example.com', 'public_html/blog');
+Cpanel::domains()->deleteSubdomain('newuser', 'blog.example.com');
+Cpanel::domains()->listSubdomains('newuser');
+
+Cpanel::domains()->parkDomain('newuser', 'parked.com', 'example.com');
+Cpanel::domains()->unparkDomain('newuser', 'parked.com', 'example.com');
+Cpanel::domains()->listParkedDomains('newuser');
+```
+
+```php
+// Email accounts are also account-scoped and proxied the same way as DomainManager.
+Cpanel::email()->create('newuser', 'example.com', 'info', 'S3cur3Pass!', 500); // quota in MB, 0 = unlimited
+Cpanel::email()->delete('newuser', 'example.com', 'info');
+Cpanel::email()->changePassword('newuser', 'example.com', 'info', 'N3wPass!');
+Cpanel::email()->editQuota('newuser', 'example.com', 'info', 1000);
+Cpanel::email()->list('newuser', 'example.com'); // domain filter optional
+```
+
 ### Calling raw WHM API functions
 
 Any WHM API 1 function not yet wrapped by this SDK can be called directly through the underlying client:
@@ -136,6 +189,10 @@ try {
 | --- | --- | --- |
 | `AccountManager` | `Cpanel::accounts()` | Create, suspend, unsuspend, terminate, list, and manage cPanel accounts |
 | `PackageManager` | `Cpanel::packages()` | Create, update, delete, and list hosting packages/plans |
+| `DnsManager` | `Cpanel::dns()` | Create, delete, dump, reset DNS zones, and edit zone records |
+| `SslManager` | `Cpanel::ssl()` | Install SSL certificates, fetch certificate info, and trigger AutoSSL runs |
+| `DomainManager` | `Cpanel::domains()` | Add/remove addon domains, subdomains, and parked domains on an account |
+| `EmailManager` | `Cpanel::email()` | Create, delete, list, and manage email accounts (mailboxes) on an account |
 
 More modules will be added over time. `Cpanel::whm()` is always available as an escape hatch for any WHM API function not yet wrapped.
 

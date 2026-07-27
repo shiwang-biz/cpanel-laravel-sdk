@@ -51,6 +51,25 @@ class WhmClient
         return $data;
     }
 
+    /**
+     * Proxy a call through WHM to a specific cPanel account's classic API 2
+     * (or UAPI, apiVersion 3) module/function. Used for account-scoped
+     * operations — e.g. addon/parked/subdomains — that have no direct WHM
+     * API 1 equivalent and must be run in the context of a cPanel user.
+     *
+     * @param  array<string, mixed>  $params
+     * @return array<string, mixed>
+     */
+    public function cpanelApiRequest(string $user, string $module, string $func, array $params = [], string $method = 'GET', int $apiVersion = 2): array
+    {
+        return $this->request('cpanel', array_merge($params, [
+            'cpanel_jsonapi_user' => $user,
+            'cpanel_jsonapi_apiversion' => $apiVersion,
+            'cpanel_jsonapi_module' => $module,
+            'cpanel_jsonapi_func' => $func,
+        ]), $method);
+    }
+
     protected function pendingRequest(): PendingRequest
     {
         return Http::withBasicAuth($this->username, $this->password)
@@ -66,7 +85,12 @@ class WhmClient
     {
         // Modern WHM API 1 functions wrap the result in `metadata.result`.
         // Some legacy functions instead return a `result[0].status` envelope.
-        $result = $data['metadata']['result'] ?? $data['result'][0]['status'] ?? null;
+        // Calls proxied through `cpanel` (classic API 2 / UAPI) wrap it in
+        // `cpanelresult.event.result` instead.
+        $result = $data['metadata']['result']
+            ?? $data['result'][0]['status']
+            ?? $data['cpanelresult']['event']['result']
+            ?? null;
 
         if ($result === null) {
             return;
@@ -75,6 +99,7 @@ class WhmClient
         if ((int) $result !== 1) {
             $reason = $data['metadata']['reason']
                 ?? $data['result'][0]['statusmsg']
+                ?? $this->cpanelResultErrorReason($data)
                 ?? 'Unknown WHM API error.';
 
             throw new WhmRequestException(
@@ -83,5 +108,15 @@ class WhmClient
                 $httpStatus,
             );
         }
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function cpanelResultErrorReason(array $data): ?string
+    {
+        $errors = $data['cpanelresult']['event']['errors'] ?? null;
+
+        return is_array($errors) ? implode('; ', $errors) : $errors;
     }
 }
