@@ -1,7 +1,17 @@
-# cPanel Laravel SDK
+<p align="center">
+  <img src="assets/logo.svg" width="140" height="140" alt="cPanel Laravel SDK logo">
+</p>
 
-[![Source](https://img.shields.io/badge/github-shiwang--biz%2Fcpanel--laravel--sdk-blue)](https://github.com/shiwang-biz/cpanel-laravel-sdk)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+<h1 align="center">cPanel Laravel SDK</h1>
+
+<p align="center">
+  <a href="https://packagist.org/packages/shiwang-biz/cpanel-laravel-sdk"><img src="https://img.shields.io/packagist/v/shiwang-biz/cpanel-laravel-sdk.svg?style=flat-square" alt="Latest Version on Packagist"></a>
+  <a href="https://github.com/shiwang-biz/cpanel-laravel-sdk/releases"><img src="https://img.shields.io/github/v/release/shiwang-biz/cpanel-laravel-sdk?style=flat-square" alt="Latest Release"></a>
+  <a href="https://packagist.org/packages/shiwang-biz/cpanel-laravel-sdk"><img src="https://img.shields.io/packagist/dt/shiwang-biz/cpanel-laravel-sdk.svg?style=flat-square" alt="Total Downloads"></a>
+  <a href="https://packagist.org/packages/shiwang-biz/cpanel-laravel-sdk"><img src="https://img.shields.io/packagist/php-v/shiwang-biz/cpanel-laravel-sdk?style=flat-square" alt="PHP Version"></a>
+  <img src="https://img.shields.io/badge/Laravel-10%20%7C%2011%20%7C%2012%20%7C%2013-FF2D20?style=flat-square&logo=laravel" alt="Laravel 10-13">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/shiwang-biz/cpanel-laravel-sdk?style=flat-square" alt="License"></a>
+</p>
 
 A Laravel SDK for the WHM JSON API, authenticated via WHM root/reseller credentials (the same approach WHMCS uses to manage cPanel accounts without storing per-account passwords).
 
