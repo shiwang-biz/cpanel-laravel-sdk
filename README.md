@@ -80,12 +80,28 @@ Cpanel::accounts()->changePassword('newuser', 'N3wPass!');
 Cpanel::accounts()->editQuota('newuser', 5000); // MB, 0 = unlimited
 ```
 
+```php
+// Create a hosting package
+Cpanel::packages()->create([
+    'name' => 'gold',
+    'quota' => 5000,
+    'bwlimit' => 10000,
+]);
+
+// Update / delete a package
+Cpanel::packages()->update('gold', ['quota' => 10000]);
+Cpanel::packages()->delete('gold');
+
+// List packages
+Cpanel::packages()->list();
+```
+
 ### Calling raw WHM API functions
 
 Any WHM API 1 function not yet wrapped by this SDK can be called directly through the underlying client:
 
 ```php
-Cpanel::whm()->request('listpkgs', [], 'GET');
+Cpanel::whm()->request('showhostname', [], 'GET');
 ```
 
 ## Error Handling
@@ -109,6 +125,7 @@ try {
 | Module | Access | Description |
 | --- | --- | --- |
 | `AccountManager` | `Cpanel::accounts()` | Create, suspend, unsuspend, terminate, list, and manage cPanel accounts |
+| `PackageManager` | `Cpanel::packages()` | Create, update, delete, and list hosting packages/plans |
 
 More modules will be added over time. `Cpanel::whm()` is always available as an escape hatch for any WHM API function not yet wrapped.
 
