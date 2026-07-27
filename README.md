@@ -8,7 +8,7 @@ A Laravel SDK for the WHM JSON API, authenticated via WHM root/reseller credenti
 ## Requirements
 
 - PHP ^8.1
-- Laravel (`illuminate/support`, `illuminate/http`) ^10.0 | ^11.0 | ^12.0
+- Laravel (`illuminate/support`, `illuminate/http`) ^10.0 | ^11.0 | ^12.0 | ^13.0
 
 ## Installation
 
