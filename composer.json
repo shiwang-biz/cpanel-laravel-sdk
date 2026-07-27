@@ -1,0 +1,38 @@
+{
+    "name": "shiwang/cpanel-laravel-sdk",
+    "description": "Laravel SDK for WHM and cPanel APIs, authenticated via WHM root credentials (WHMCS-style account management).",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "cpanel", "whm", "hosting", "sdk"],
+    "require": {
+        "php": "^8.1",
+        "illuminate/support": "^10.0|^11.0|^12.0",
+        "illuminate/http": "^10.0|^11.0|^12.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^8.0|^9.0|^10.0",
+        "phpunit/phpunit": "^10.0|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Shiwang\\CpanelLaravelSdk\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Shiwang\\CpanelLaravelSdk\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Shiwang\\CpanelLaravelSdk\\CpanelServiceProvider"
+            ],
+            "aliases": {
+                "Cpanel": "Shiwang\\CpanelLaravelSdk\\Facades\\Cpanel"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
