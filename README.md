@@ -1,21 +1,22 @@
 # cPanel Laravel SDK
 
-A Laravel package for managing cPanel accounts through the WHM API, authenticated
-with a WHM root/reseller username and password (the same approach WHMCS uses).
+[![Source](https://img.shields.io/badge/github-shiwang--biz%2Fcpanel--laravel--sdk-blue)](https://github.com/shiwang-biz/cpanel-laravel-sdk)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Current scope: **WHM account management** (create, suspend, unsuspend, terminate,
-list, summarize, change package, change password, edit quota). The HTTP layer
-(`WhmClient`) is generic, so more WHM functions — and a cPanel UAPI pass-through
-for per-account operations like email/DNS/MySQL — can be added as thin modules
-on top without changing the core.
+A Laravel SDK for the WHM JSON API, authenticated via WHM root/reseller credentials (the same approach WHMCS uses to manage cPanel accounts without storing per-account passwords).
+
+## Requirements
+
+- PHP ^8.1
+- Laravel (`illuminate/support`, `illuminate/http`) ^10.0 | ^11.0 | ^12.0
 
 ## Installation
 
 ```bash
-composer require shiwang/cpanel-laravel-sdk
+composer require shiwang-biz/cpanel-laravel-sdk
 ```
 
-The service provider and `Cpanel` facade are auto-discovered by Laravel.
+The package auto-registers its service provider and `Cpanel` facade via Laravel package discovery.
 
 Publish the config file:
 
@@ -25,10 +26,10 @@ php artisan vendor:publish --tag=cpanel-config
 
 ## Configuration
 
-Add to your `.env`:
+Set the following in your `.env`:
 
-```
-CPANEL_WHM_HOST=whm.yourserver.com
+```env
+CPANEL_WHM_HOST=whm.example.com
 CPANEL_WHM_PORT=2087
 CPANEL_WHM_USERNAME=root
 CPANEL_WHM_PASSWORD=your-whm-password
@@ -36,77 +37,88 @@ CPANEL_WHM_VERIFY_SSL=true
 CPANEL_WHM_TIMEOUT=30
 ```
 
-> Consider using a dedicated reseller account with only the ACLs it needs,
-> rather than the true `root` account, and keep the password out of version
-> control.
+| Key | Env Variable | Default | Description |
+| --- | --- | --- | --- |
+| `host` | `CPANEL_WHM_HOST` | — | WHM server hostname |
+| `port` | `CPANEL_WHM_PORT` | `2087` | WHM API port |
+| `username` | `CPANEL_WHM_USERNAME` | — | WHM root/reseller username |
+| `password` | `CPANEL_WHM_PASSWORD` | — | WHM root/reseller password |
+| `verify_ssl` | `CPANEL_WHM_VERIFY_SSL` | `true` | Verify the WHM server's SSL certificate |
+| `timeout` | `CPANEL_WHM_TIMEOUT` | `30` | HTTP request timeout in seconds |
 
 ## Usage
+
+Use the `Cpanel` facade, or inject `Shiwang\CpanelLaravelSdk\CpanelManager`.
 
 ```php
 use Shiwang\CpanelLaravelSdk\Facades\Cpanel;
 
-// Create an account
+// Create a cPanel account
 Cpanel::accounts()->create([
     'username' => 'newuser',
     'domain' => 'example.com',
-    'password' => 'a-strong-password',
+    'password' => 'S3cur3Pass!',
     'plan' => 'default',
 ]);
 
 // Suspend / unsuspend
-Cpanel::accounts()->suspend('newuser', 'Payment overdue');
+Cpanel::accounts()->suspend('newuser', 'Non-payment');
 Cpanel::accounts()->unsuspend('newuser');
 
-// Terminate
-Cpanel::accounts()->terminate('newuser');
+// Terminate an account
+Cpanel::accounts()->terminate('newuser', keepDns: false);
 
-// List / inspect
-$accounts = Cpanel::accounts()->list(['search' => 'example.com', 'searchtype' => 'domain']);
-$summary = Cpanel::accounts()->summary('newuser');
+// List accounts (optionally filtered)
+Cpanel::accounts()->list(['search' => 'example.com', 'searchtype' => 'domain']);
 
-// Change package, password, quota
+// Account summary
+Cpanel::accounts()->summary('newuser');
+
+// Change hosting package / password / quota
 Cpanel::accounts()->changePackage('newuser', 'premium');
-Cpanel::accounts()->changePassword('newuser', 'new-strong-password');
+Cpanel::accounts()->changePassword('newuser', 'N3wPass!');
 Cpanel::accounts()->editQuota('newuser', 5000); // MB, 0 = unlimited
 ```
 
-### Raw WHM API access
+### Calling raw WHM API functions
 
-Any WHM API 1 function not yet wrapped by a module can be called directly:
+Any WHM API 1 function not yet wrapped by this SDK can be called directly through the underlying client:
 
 ```php
-Cpanel::whm()->request('listpkgs');
-Cpanel::whm()->request('createacct', [...], 'POST');
+Cpanel::whm()->request('listpkgs', [], 'GET');
 ```
 
-### Error handling
+## Error Handling
 
-Failed WHM calls (bad HTTP status, or `metadata.result === 0`) throw
-`Shiwang\CpanelLaravelSdk\Exceptions\WhmRequestException`, which carries the
-raw decoded response via `->response()`.
+Failed HTTP requests and unsuccessful WHM API results (`metadata.result !== 1` or legacy `result[0].status !== 1`) both throw `Shiwang\CpanelLaravelSdk\Exceptions\WhmRequestException`, which exposes the decoded response and HTTP status:
 
 ```php
 use Shiwang\CpanelLaravelSdk\Exceptions\WhmRequestException;
 
 try {
-    Cpanel::accounts()->create([...]);
+    Cpanel::accounts()->suspend('ghost');
 } catch (WhmRequestException $e) {
-    logger()->error($e->getMessage(), $e->response());
+    $e->getMessage();  // "WHM API call [suspendacct] failed: No such user"
+    $e->response();    // full decoded WHM response
+    $e->httpStatus();  // HTTP status code
 }
 ```
+
+## Modules
+
+| Module | Access | Description |
+| --- | --- | --- |
+| `AccountManager` | `Cpanel::accounts()` | Create, suspend, unsuspend, terminate, list, and manage cPanel accounts |
+
+More modules will be added over time. `Cpanel::whm()` is always available as an escape hatch for any WHM API function not yet wrapped.
 
 ## Testing
 
 ```bash
 composer install
-./vendor/bin/phpunit
+vendor/bin/phpunit
 ```
 
-Tests use Orchestra Testbench and `Http::fake()` — no live WHM server required.
+## License
 
-## Roadmap
-
-- cPanel UAPI pass-through (via WHM's `cpanel` API function) for per-account
-  email, DNS, MySQL, and SSL management without separate cPanel credentials.
-- WHM package/plan management.
-- DNS zone editor helpers.
+MIT
