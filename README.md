@@ -159,6 +159,16 @@ Cpanel::email()->editQuota('newuser', 'example.com', 'info', 1000);
 Cpanel::email()->list('newuser', 'example.com'); // domain filter optional
 ```
 
+```php
+// One-time login URLs for cPanel/Webmail — no account password needed
+// (the mechanism behind WHMCS-style "Log in to cPanel" buttons).
+$cpanelUrl = Cpanel::sessions()->cpanelLoginUrl('newuser');
+$webmailUrl = Cpanel::sessions()->webmailLoginUrl('newuser', app: 'roundcube');
+
+// Or the raw call, for the WHM dashboard itself (service: whostmgrd) etc.
+Cpanel::sessions()->create('newuser', service: 'cpaneld', locale: 'en');
+```
+
 ### Calling raw WHM API functions
 
 Any WHM API 1 function not yet wrapped by this SDK can be called directly through the underlying client:
@@ -193,6 +203,7 @@ try {
 | `SslManager` | `Cpanel::ssl()` | Install SSL certificates, fetch certificate info, and trigger AutoSSL runs |
 | `DomainManager` | `Cpanel::domains()` | Add/remove addon domains, subdomains, and parked domains on an account |
 | `EmailManager` | `Cpanel::email()` | Create, delete, list, and manage email accounts (mailboxes) on an account |
+| `SessionManager` | `Cpanel::sessions()` | Create one-time login sessions/URLs for cPanel, Webmail, or WHM |
 
 More modules will be added over time. `Cpanel::whm()` is always available as an escape hatch for any WHM API function not yet wrapped.
 

@@ -7,6 +7,7 @@ use Shiwang\CpanelLaravelSdk\Modules\DnsManager;
 use Shiwang\CpanelLaravelSdk\Modules\DomainManager;
 use Shiwang\CpanelLaravelSdk\Modules\EmailManager;
 use Shiwang\CpanelLaravelSdk\Modules\PackageManager;
+use Shiwang\CpanelLaravelSdk\Modules\SessionManager;
 use Shiwang\CpanelLaravelSdk\Modules\SslManager;
 
 class CpanelManager
@@ -22,6 +23,8 @@ class CpanelManager
     protected ?DomainManager $domains = null;
 
     protected ?EmailManager $email = null;
+
+    protected ?SessionManager $sessions = null;
 
     public function __construct(protected WhmClient $whm)
     {
@@ -63,5 +66,10 @@ class CpanelManager
     public function email(): EmailManager
     {
         return $this->email ??= new EmailManager($this->whm);
+    }
+
+    public function sessions(): SessionManager
+    {
+        return $this->sessions ??= new SessionManager($this->whm);
     }
 }

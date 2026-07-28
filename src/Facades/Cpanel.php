@@ -9,6 +9,7 @@ use Shiwang\CpanelLaravelSdk\Modules\DnsManager;
 use Shiwang\CpanelLaravelSdk\Modules\DomainManager;
 use Shiwang\CpanelLaravelSdk\Modules\EmailManager;
 use Shiwang\CpanelLaravelSdk\Modules\PackageManager;
+use Shiwang\CpanelLaravelSdk\Modules\SessionManager;
 use Shiwang\CpanelLaravelSdk\Modules\SslManager;
 use Shiwang\CpanelLaravelSdk\WhmClient;
 
@@ -20,6 +21,7 @@ use Shiwang\CpanelLaravelSdk\WhmClient;
  * @method static SslManager ssl()
  * @method static DomainManager domains()
  * @method static EmailManager email()
+ * @method static SessionManager sessions()
  *
  * @see CpanelManager
  */

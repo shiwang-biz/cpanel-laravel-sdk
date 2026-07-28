@@ -7,7 +7,7 @@ use Shiwang\CpanelLaravelSdk\WhmClient;
 class AccountManager
 {
     public function __construct(protected WhmClient $client)
-    {
+    {  
     }
 
     /**
