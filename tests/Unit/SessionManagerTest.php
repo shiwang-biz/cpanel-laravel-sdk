@@ -65,6 +65,23 @@ class SessionManagerTest extends TestCase
             && $request['app'] === 'roundcube');
     }
 
+    public function test_whm_login_url_sends_whostmgrd_service(): void
+    {
+        Http::fake([
+            'whm.example.com:2087/json-api/create_user_session*' => Http::response([
+                'metadata' => ['result' => 1, 'reason' => 'Created session', 'command' => 'create_user_session', 'version' => 1],
+                'data' => ['url' => 'https://whm.example.com:2087/cpsess1234/login/?session=abc', 'service' => 'whostmgrd'],
+            ]),
+        ]);
+
+        $url = Cpanel::sessions()->whmLoginUrl('root');
+
+        $this->assertSame('https://whm.example.com:2087/cpsess1234/login/?session=abc', $url);
+
+        Http::assertSent(fn ($request) => $request['service'] === 'whostmgrd'
+            && $request['user'] === 'root');
+    }
+
     public function test_create_fails_throws_exception(): void
     {
         Http::fake([

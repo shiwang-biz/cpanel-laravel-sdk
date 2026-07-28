@@ -164,8 +164,9 @@ Cpanel::email()->list('newuser', 'example.com'); // domain filter optional
 // (the mechanism behind WHMCS-style "Log in to cPanel" buttons).
 $cpanelUrl = Cpanel::sessions()->cpanelLoginUrl('newuser');
 $webmailUrl = Cpanel::sessions()->webmailLoginUrl('newuser', app: 'roundcube');
+$whmUrl = Cpanel::sessions()->whmLoginUrl('root'); // requires a WHM root/reseller username
 
-// Or the raw call, for the WHM dashboard itself (service: whostmgrd) etc.
+// Or the raw call for any service (cpaneld / webmaild / whostmgrd)
 Cpanel::sessions()->create('newuser', service: 'cpaneld', locale: 'en');
 ```
 

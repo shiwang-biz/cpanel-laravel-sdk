@@ -45,4 +45,13 @@ class SessionManager
     {
         return $this->create($username, 'webmaild', $app, $locale)['data']['url'];
     }
+
+    /**
+     * One-time login URL for the WHM dashboard. Requires a WHM root/reseller
+     * username, not a regular cPanel account username.
+     */
+    public function whmLoginUrl(string $username, ?string $app = null, ?string $locale = null): string
+    {
+        return $this->create($username, 'whostmgrd', $app, $locale)['data']['url'];
+    }
 }
